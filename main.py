@@ -8,10 +8,8 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Load environment variables
 load_dotenv()
 
-# Initialize FastAPI application
 app = FastAPI(
     title="POSTFEED News Aggregator API",
     description="Unified backend service providing real-time aggregated news and reliability metrics for Flutter client.",
@@ -27,12 +25,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- IN-MEMORY CACHE SETUP ---
 CACHE_TTL = 600  # 10 Minutes Cache TTL
 cached_news_data = []
 last_fetch_time = 0.0
 
-# --- DATA SCHEMAS (Pydantic Models for JSON Validation) ---
 class Article(BaseModel):
     id: str
     title: str
@@ -48,7 +44,6 @@ class NewsResponse(BaseModel):
     total_results: int
     data: List[Article]
 
-# --- CATEGORIZATION ENGINE ---
 CATEGORY_KEYWORDS = {
     "Technology": ["tech", "ai", "software", "apple", "google", "microsoft", "cyber", "data", "app", "semiconductor", "quantum", "robot", "crypto", "digital"],
     "Business & Finance": ["stock", "market", "economy", "bank", "trade", "investment", "rupee", "dollar", "gdp", "profit", "business", "inflation", "tax"],
@@ -85,7 +80,6 @@ def calculate_reliability(source: str, has_image: bool, description: str) -> int
         
     return min(score, 98)
 
-# --- INDIVIDUAL API FETCH FUNCTIONS ---
 def fetch_newsdata_news() -> List[dict]:
     api_key = os.getenv("NEWS_DATA_API_KEY")
     if not api_key:
@@ -229,7 +223,6 @@ def aggregate_and_deduplicate() -> List[dict]:
     last_fetch_time = current_time
     return cached_news_data
 
-# --- API ENDPOINTS ---
 
 @app.get("/", tags=["Health Check"])
 def root():
